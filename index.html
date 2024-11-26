@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>귤현차량기지 간이 조직도</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+        }
+        header {
+            background-color: white;
+            color: black;
+            text-align: center;
+            padding: 1rem 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid #0078D4;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 1200px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .search-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 4px;
+            transition: border-color 0.3s ease;
+        }
+        .search-bar input:focus {
+            border-color: #0078D4;
+            outline: none;
+        }
+        .results {
+            display: grid;
+            grid-template-columns: auto auto; /* 각 열의 크기를 콘텐츠에 맞게 조정 */
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .team {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: white;
+            position: relative;
+        }
+        .team h2 {
+            background-color: #f2f2f2;
+            color: black;
+            padding: 10px;
+            font-size: 18px;
+            margin: 0;
+            border-bottom: 2px solid #87CEEB;
+        }
+        .employee-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        .employee-list li {
+            padding: 10px;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .employee-list li:hover {
+            background-color: #eaf6ff;
+        }
+        .employee-list li:last-child {
+            border-bottom: none;
+        }
+        .editable {
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .editable:hover {
+            background-color: #f0f0f0;
+        }
+        .delete-button {
+            background: #f2f2f2; /* 옅은 회색 배경 */
+            color: #cc0000; /* 빨간색 */
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .delete-button:hover {
+            background: #e0e0e0; /* 더 옅은 회색 */
+        }
+        .add-button-container {
+            position: absolute;
+            right: 10px; /* 오른쪽에 배치 */
+            top: 10px; /* 소속 칸 위쪽에 배치 */
+        }
+        .add-button {
+            background: #f2f2f2; /* 배경색 */
+            color: #0044cc; /* 파란색 텍스트 */
+            border: none;
+            font-size: 18px; /* 버튼 크기 조정 */
+            font-weight: bold;
+            cursor: pointer;
+            width: 24px; /* 버튼 너비 */
+            height: 24px; /* 버튼 높이 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .add-button:hover {
+            background: #e0e0e0; /* 배경 색 강조 */
+        }
+        .highlight {
+            color: #0078D4;
+            font-weight: bold;
+        }
+        /* 모바일 최적화 */
+        @media screen and (max-width: 768px) {
+            .results {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>귤현차량기지 조직도</h1>
+</header>
+
+<div class="container">
+    <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="이름 또는 소속 검색..." oninput="search()">
+    </div>
+    <div class="results" id="results">
+        <!-- 조직별 섹션이 여기에 동적으로 추가됩니다 -->
+    </div>
+</div>
+
+<script>
+    // 기본 직원 데이터
+    let employees = [
+        { name: "이혜자 3811", department: "기지지원팀" },
+        { name: "이세훈 3812", department: "기지지원팀" },
+        { name: "김숙경 3818", department: "기지지원팀" },
+        { name: "한상빈 3816", department: "기지지원팀" },
+        { name: "최호준 3814", department: "기지지원팀" },
+        { name: "한결 3817", department: "기지지원팀" },
+        { name: "허정 3813", department: "기지지원팀" },
+        { name: "손은지 3815", department: "기지지원팀" },
+        { name: "손응호 3900, 3805", department: "경비주임(안내실)" },
+        { name: "정택균 3900, 3805", department: "경비주임(안내실)" },
+        { name: "남기철 3900, 3805", department: "경비주임(안내실)" },
+        { name: "연규태 3776", department: "기지지원팀(시설관리)" },
+        { name: "박은숙 3749", department: "기지지원팀(시설관리)" },
+        { name: "방재실 3886", department: "기지지원팀(시설관리)" },
+        { name: "기계실 3969, 3787", department: "기지지원팀(시설관리)" },
+        { name: "이근수 3775", department: "기지지원팀(시설관리)" },
+        { name: "김기범 3740", department: "인재양성팀" },
+        { name: "안세은 3741", department: "인재양성팀" },
+        { name: "천기수 3743", department: "인재양성팀" },
+        { name: "지예나 3745", department: "인재양성팀" },
+        { name: "김가영 3744", department: "인재양성팀" },
+        { name: "나갑준 3751", department: "기술전수팀" },
+        { name: "최동진 3769", department: "기술전수팀" },
+        { name: "유창수 3765", department: "기술전수팀" },
+        { name: "윤동렬 3766", department: "기술전수팀" },
+        { name: "배성원 3760", department: "기술전수팀" },
+        { name: "최승욱 3767", department: "기술전수팀" },
+        { name: "이종구 3762", department: "기술전수팀" },
+        { name: "조동주 3763", department: "기술전수팀" },
+        { name: "김준희 3752", department: "기술전수팀" },
+        { name: "김진 3757", department: "기술전수팀" },
+        { name: "박기훈 3754", department: "기술전수팀" },
+        { name: "김민지 3753", department: "기술전수팀" },
+        { name: "김혁 3755", department: "기술전수팀" },
+        { name: "김성률 3005", department: "굴현승무팀" },
+        { name: "이계신 3931", department: "굴현승무팀" },
+        { name: "강민규 3932", department: "굴현승무팀" },
+        { name: "최한락 3934", department: "굴현승무팀" },
+        { name: "이승우 3933", department: "굴현승무팀" },
+        { name: "박민준 3935", department: "굴현승무팀" },
+        { name: "허병진 3937", department: "굴현승무팀" },
+        { name: "김상현 3939, 3940", department: "굴현승무팀" },
+        { name: "이호성 3939, 3940", department: "굴현승무팀" },
+        { name: "이상달 3939, 3940", department: "굴현승무팀" },
+        { name: "이건 3938", department: "굴현승무팀" },
+        { name: "이승욱 3936", department: "굴현승무팀" },
+        { name: "강준구 3821", department: "경정비팀" },
+        { name: "최찬현 3825", department: "경정비팀" },
+        { name: "김종현 3827", department: "경정비팀" },
+        { name: "김성현 3823", department: "경정비팀" },
+        { name: "이태우 3824", department: "경정비팀" },
+        { name: "서동윤 3826", department: "경정비팀" },
+        { name: "김보경 3828", department: "경정비팀" },
+        { name: "정용 3854", department: "경정비팀" },
+        { name: "이건웅 3865", department: "경정비팀" },
+        { name: "구본선 3867", department: "경정비팀" },
+        { name: "구민준 3866", department: "경정비팀" },
+        { name: "신채연 3869", department: "경정비팀" },
+        { name: "이인택 3868", department: "경정비팀" },
+        { name: "김봉석 3849", department: "경정비팀" },
+        { name: "이종욱 3839", department: "경정비팀" },
+        { name: "김경석 3850", department: "경정비팀" },
+        { name: "김대운 3829", department: "경정비팀" },
+        { name: "오환 3951", department: "경정비팀" },
+        { name: "이호원 3838", department: "경정비팀" },
+        { name: "박용태", department: "경정비팀" },
+        { name: "조남영", department: "경정비팀" },
+        { name: "이정세", department: "경정비팀" },
+        { name: "장진용", department: "경정비팀" },
+        { name: "김혜련", department: "경정비팀" },
+        { name: "조항욱", department: "경정비팀" },
+        { name: "이승희", department: "경정비팀" },
+        { name: "유경남", department: "경정비팀" },
+        { name: "김효빈", department: "경정비팀" },
+        { name: "조용제", department: "경정비팀" },
+        { name: "이세동", department: "경정비팀" },
+        { name: "박영훈", department: "경정비팀" },
+        { name: "정우창", department: "경정비팀" },
+        { name: "박동재", department: "경정비팀" },
+        { name: "김현기", department: "경정비팀" },
+        { name: "최봉호", department: "경정비팀" },
+        { name: "이혜령", department: "경정비팀" },
+        { name: "한승구", department: "경정비팀" },
+        { name: "강재혁", department: "경정비팀" },
+        { name: "편기봉", department: "경정비팀" },
+        { name: "김동우", department: "경정비팀" },
+        { name: "유경덕", department: "경정비팀" },
+        { name: "장경환", department: "경정비팀" },
+        { name: "유수영", department: "경정비팀" },
+        { name: "안한진", department: "경정비팀" },
+        { name: "위진영", department: "경정비팀" },
+        { name: "채수옹", department: "경정비팀" },
+        { name: "홍성덕", department: "경정비팀" },
+        { name: "박현철", department: "경정비팀" },
+        { name: "김동한", department: "경정비팀" },
+        { name: "송승환", department: "경정비팀" },
+        { name: "인병훈", department: "경정비팀" },
+        { name: "이태규", department: "경정비팀" },
+        { name: "김민정", department: "경정비팀" },
+        { name: "고보승", department: "경정비팀" },
+        { name: "류한철", department: "경정비팀" },
+        { name: "김은식", department: "경정비팀" },
+        { name: "조경평 3824", department: "경정비팀" },
+        { name: "신창하 3428", department: "경정비팀" },
+        { name: "김윤구 3426", department: "경정비팀" },
+        { name: "성혁 3428", department: "경정비팀" },
+        { name: "안태범 3426", department: "경정비팀" },
+        { name: "김태환 3428", department: "경정비팀" },
+        { name: "최순양 3426", department: "경정비팀" },
+        { name: "이영호 3428", department: "경정비팀" },
+        { name: "이창후 3426", department: "경정비팀" },
+        { name: "현광진 3871", department: "중정비팀" },
+        { name: "정동훈 3872", department: "중정비팀" },
+        { name: "민풍기 3875", department: "중정비팀" },
+        { name: "홍성은 3874", department: "중정비팀" },
+        { name: "오현민 3873", department: "중정비팀" },
+        { name: "김재연 3877", department: "중정비팀" },
+        { name: "송연지 3878", department: "중정비팀" },
+        { name: "김종욱 3876", department: "중정비팀" },
+        { name: "배덕규 3915", department: "중정비팀" },
+        { name: "윤봉길 3912", department: "중정비팀" },
+        { name: "이강준 3882", department: "중정비팀" },
+        { name: "심준호 3885", department: "중정비팀" },
+        { name: "차정욱 3884", department: "중정비팀" },
+        { name: "이재광 3888", department: "중정비팀" },
+        { name: "박준후 3883", department: "중정비팀" },
+        { name: "황용 3889", department: "중정비팀" },
+        { name: "한봉구 3892", department: "중정비팀" },
+        { name: "서보준 3896", department: "중정비팀" },
+        { name: "송재경 3898", department: "중정비팀" },
+        { name: "김기수 3895", department: "중정비팀" },
+        { name: "유재훈 3899", department: "중정비팀" },
+        { name: "김명철 3894", department: "중정비팀" },
+        { name: "이종준 3897", department: "중정비팀" },
+        { name: "3961", department: "기지신호파트" },
+        { name: "3311", department: "기지전기파트" },
+        { name: "3331", department: "기지통신파트" },
+        { name: "3371", department: "중정비전자파트" },
+        { name: "3341", department: "기지토목파트" },
+    ];
+
+    // 부서별 그룹화 함수
+    function groupByDepartment(data) {
+        return data.reduce((acc, employee) => {
+            if (!acc[employee.department]) acc[employee.department] = [];
+            acc[employee.department].push(employee);
+            return acc;
+        }, {});
+    }
+
+    // 검색어 하이라이트
+    function highlightText(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, "gi");
+        return text.replace(regex, '<span class="highlight">$1</span>');
+    }
+
+    // 팀 추가 함수
+    function addEmployee(department) {
+        const newName = prompt("이름과 내선 번호를 입력하세요:");
+        if (newName) {
+            // 새로운 직원 추가
+            employees.push({ name: newName, department });
+
+            // 직원 데이터가 추가되면 즉시 검색을 통해 갱신된 목록을 렌더링합니다
+            search();
+        }
+    }
+
+    // 직원 삭제 함수
+    function deleteEmployee(name) {
+        const index = employees.findIndex(employee => employee.name === name);
+        if (index !== -1) {
+            employees.splice(index, 1); // 직원 삭제
+            search(); // 삭제 후 갱신
+        }
+    }
+
+    // 데이터 렌더링
+    function renderGroups(data, query) {
+        const groupedData = groupByDepartment(data);
+        resultsContainer.innerHTML = ''; // 이전 내용을 초기화
+        Object.keys(groupedData).forEach(department => {
+            const section = document.createElement('div');
+            section.className = 'team';
+            section.innerHTML = `
+                <h2>${highlightText(department, query)}</h2>
+                <ul class="employee-list">
+                    ${groupedData[department].map(employee => ` 
+                        <li>
+                            <span class="editable">${highlightText(employee.name, query)}</span>
+                            <button class="delete-button" onclick="deleteEmployee('${employee.name}')">-</button>
+                        </li>`).join('')}
+                </ul>
+                <div class="add-button-container">
+                    <button class="add-button" onclick="addEmployee('${department}')">+</button>
+                </div>
+            `;
+            resultsContainer.appendChild(section);
+        });
+    }
+
+    // 검색
+    function search() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const filteredEmployees = employees.filter(employee =>
+            employee.name.toLowerCase().includes(query) || 
+            employee.department.toLowerCase().includes(query)
+        );
+        renderGroups(filteredEmployees, query);
+    }
+
+    // 초기 렌더링
+    const resultsContainer = document.getElementById('results');
+    renderGroups(employees, '');
+
+</script>
+
+</body>
+</html>
+
